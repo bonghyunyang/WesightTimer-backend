@@ -64,6 +64,11 @@ class ContentAppTest(TestCase):
             time = "go to home 25h"
         )
 
+        SocialType.objects.create(
+            id = 1,
+            type = 'normal'
+        )
+
         UserIntroduction.objects.create(
            id             = 1,
            location       = Location.objects.get(id=1),
@@ -79,6 +84,7 @@ class ContentAppTest(TestCase):
            payment_status    = PaymentStatus.objects.get(id=1),
            payment           = Payment.objects.get(id=1),
            user_introduction = UserIntroduction.objects.get(id=1),
+           social_login      = SocialType.objects.get(id=1),
            subscription      = Subscription.objects.get(id=1),
            email             = "aaa@aaa.com",
            full_name         = "aaa",
@@ -131,7 +137,7 @@ class ContentAppTest(TestCase):
            description   = "none",
            image_url     = "none",
            running_time  = "10:10",
-           file_source   = "111",
+           file_source   = "/home/shoo/real_project/WesightTimer-backend/mp3/1.mp3",
            course_img    = "222"
         )
 
@@ -145,7 +151,7 @@ class ContentAppTest(TestCase):
            description   = "none",
            image_url     = "none",
            running_time  = "10:10",
-           file_source   = "111",
+           file_source   = "/home/shoo/real_project/WesightTimer-backend/mp3/2.mp3",
            course_img    = "222"
         )
 
@@ -159,7 +165,7 @@ class ContentAppTest(TestCase):
            description   = "none",
            image_url     = "none",
            running_time  = "10:10",
-           file_source   = "111",
+           file_source   = "/home/shoo/real_project/WesightTimer-backend/mp3/3.mp3",
            course_img    = "222"
         )
 
@@ -221,6 +227,11 @@ class ContentAppTest(TestCase):
         response = client.get('/content/playlistmain?offset=-1&limit=1000000')
         self.assertEqual(response.status_code, 400)
 
+    def test_play_list_info_does_not_exsist(self):
+        client   = Client()
+        response = client.get('/content/playlistinfo/-11111')
+        self.assertEqual(response.status_code, 404)
+
     def test_play_list_main_success(self):
         client  = Client()
         response = client.get('/content/playlistmain?offset=0&limit=1')
@@ -237,16 +248,11 @@ class ContentAppTest(TestCase):
                     "discribe": "playplay",
                     "image_url": ["none", "none", "none"]
                 }
-            ] 
+            ]
         }
         )
 
-    def test_play_list_info_does_not_exsist(self):
-        client   = Client()
-        response = client.get('/content/playlistinfo/-11111')
-        self.assertEqual(response.status_code, 404)
-
-    def test_play_list_info_success(self):
+    def test_play_list_info_success_response(self):
         client   = Client()
         response = client.get('/content/playlistinfo/1')
         self.assertEqual(response.json(),
@@ -282,3 +288,19 @@ class ContentAppTest(TestCase):
             ]
         }
         )
+
+    def test_contentplay_bad_request(self):
+        client   =  Client()
+        response = client.get('/content/playcontent/-111')
+        self.assertEqual(response.status_code, 404)
+
+    def test_contentplay_dose_not_exsist(self):
+        client   = Client()
+        response = client.get('/content/playcontent/99999999999')
+        self.assertEqual(response.status_code, 404)
+
+    def test_contentplay_success_response(self):
+        client   = Client()
+        response = client.get('/content/playcontent/3')
+        self.assertEqual(response.get('Content-Type'), 'audio/mp3')
+        self.assertEqual(response.status_code, 200)

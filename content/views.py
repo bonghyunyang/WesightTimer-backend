@@ -89,3 +89,56 @@ class PlayListMain(View):
 
         except ValueError:
             return HttpResponse(status = 400)
+
+class RangeFileWrapper (object):
+    def __init__(self, filelike, blksize, resume, length=None):
+        self.filelike = filelike
+        self.remaining = length - resume
+        self.blksize = blksize
+        data = self.filelike.seek(resume)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.remaining is None:
+            data = self.filelike.read(self.blksize)
+            if data:
+                return data
+            raise StopIteration()
+        else:
+            if self.remaining <= 0:
+                raise StopIteration()
+            data = self.filelike.read(min(self.remaining, self.blksize))
+            if not data:
+                raise StopIteration()
+            self.remaining -= len(data)
+            return data
+
+class ContentPlay(View):
+    def get(self, request, content_id):
+        try:
+            if content_id < 0 or content_id > len(Content.objects.all()):
+                return HttpResponse(status = 404)
+
+            second  = int(request.GET.get('second', 0))
+            content  = Content.objects.get(id = content_id)
+            source  = content.file_source
+            name    = os.path.basename(source)
+            size    = os.path.getsize(source)
+            content = AudioSegment.from_mp3(source)
+            length  = int(len(content) / 1000)
+            chunk   = int(size / length)
+
+            if second < 0 or second > length:
+                return HttpResponse(status = 400)
+
+            resp = StreamingHttpResponse(RangeFileWrapper(open(source, 'rb'), chunk * 1, chunk * second, size), status=200, content_type = 'audio/mp3')
+            resp["Cache-Control"] = "no-cache"
+            resp["Accept-Ranges"] = "bytes"
+            resp["Content-Disposition"] = f"attachment; filename={name}"
+
+            return resp
+
+        except ObjectDoesNotExist:
+            return HttpResponse(status = 404)

@@ -4,6 +4,7 @@ class User(models.Model):
     payment_status     = models.ForeignKey('PaymentStatus', on_delete = models.SET_NULL, null = True)
     payment            = models.ForeignKey('Payment', on_delete = models.SET_NULL, null = True)
     user_introduction  = models.ForeignKey('UserIntroduction', on_delete = models.SET_NULL, null = True)
+    social_login       = models.ForeignKey('SocialType', on_delete=models.SET_NULL, null=True)
     subscription       = models.ForeignKey('Subscription', on_delete=models.SET_NULL, null=True)
     email              = models.CharField(max_length = 200)
     full_name          = models.CharField(max_length = 100)
@@ -11,6 +12,12 @@ class User(models.Model):
 
     class Meta:
         db_table = 'users'
+
+class SocialType(models.Model):
+    type = models.CharField(max_length = 50)
+
+    class Meta:
+        db_table = 'social_types'
 
 class UserIntroduction(models.Model):
     location           = models.ForeignKey('Location', on_delete = models.SET_NULL, null = True)
@@ -130,4 +137,3 @@ class TeacherFollow(models.Model):
 
     class Meta:
         db_table = 'teacher_followers'
-
