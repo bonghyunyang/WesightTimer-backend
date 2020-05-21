@@ -12,6 +12,11 @@ db.sqlite3-journal
 media
 my_settings.py
 *.csv
+*.mp3
+*.png
+*.cert
+*.key
+upload_content.py
 
 # If your build process includes running collectstatic, then you probably don't need or want to include staticfiles/
 # in your Git repository. Update and uncomment the following line accordingly.

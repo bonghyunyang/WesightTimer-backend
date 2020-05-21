@@ -14,14 +14,16 @@ class MiddleCategory(models.Model):
         db_table = 'middle_categories'
 
 class EndCategory(models.Model):
-    name = models.CharField(max_length = 50)
+    middle_category = models.ForeignKey('MiddleCategory', on_delete=models.SET_NULL, null=True)
+    name            = models.CharField(max_length = 50)
+
 
     class Meta:
         db_table = 'end_categories'
 
 class MiddleContentTag(models.Model):
     middle_category  = models.ForeignKey('MiddleCategory', on_delete=models.SET_NULL, null=True)
-    Content          = models.ForeignKey('Content', on_delete=models.SET_NULL, null=True)
+    content          = models.ForeignKey('Content', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = 'middle_content_tags'
@@ -35,14 +37,15 @@ class EndContentTag(models.Model):
 
 class Content(models.Model):
     teacher          = models.ForeignKey('user.Teacher', on_delete=models.SET_NULL, null=True)
-    meditaion_type   = models.ForeignKey('ContentType', on_delete=models.SET_NULL, null=True)
+    content_type     = models.ForeignKey('ContentType', on_delete=models.SET_NULL, null=True)
     activity_type    = models.ForeignKey('ActivityType', on_delete=models.SET_NULL, null=True)
     target           = models.ForeignKey('Target', on_delete=models.SET_NULL, null=True)
     title            = models.CharField(max_length = 100)
     description      = models.CharField(max_length = 2000)
     image_url        = models.URLField(max_length = 2000)
+    running_time     = models.CharField(max_length = 50)
     file_source      = models.CharField(max_length = 2000)
-    running_time     = models.TimeField()
+    course_img       = models.CharField(max_length = 300)
 
     class Meta:
         db_table = 'contents'
