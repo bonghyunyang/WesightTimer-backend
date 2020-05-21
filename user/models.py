@@ -1,9 +1,10 @@
 from django.db      import models
 
 class User(models.Model):
-    payment            = models.ForeignKey('Payment', on_delete = models.SET_NULL, null = True)
     payment_status     = models.ForeignKey('PaymentStatus', on_delete = models.SET_NULL, null = True)
+    payment            = models.ForeignKey('Payment', on_delete = models.SET_NULL, null = True)
     user_introduction  = models.ForeignKey('UserIntroduction', on_delete = models.SET_NULL, null = True)
+    subscription       = models.ForeignKey('Subscription', on_delete=models.SET_NULL, null=True)
     email              = models.CharField(max_length = 200)
     full_name          = models.CharField(max_length = 100)
     password           = models.CharField(max_length = 200)
@@ -31,7 +32,8 @@ class PlayHistory(models.Model):
         db_table = 'play_histories'
 
 class Location(models.Model):
-    location           = models.CharField(max_length = 50, null = True)
+    country           = models.CharField(max_length = 50, null = True)
+    city              = models.CharField(max_length = 50, null = True)
 
     class Meta:
         db_table = 'locations'
@@ -50,13 +52,13 @@ class TimeZone(models.Model):
         db_table = 'time_zones'
 
 class PaymentStatus(models.Model):
-    status             = models.SmallIntegerField(blank = True, null = True)
+    status             = models.CharField(max_length = 50, default = 0)
 
     class Meta:
         db_table = 'payment_status'
 
 class Subscription(models.Model):
-    subscribe_type     = models.ForeignKey('SubscriptionType', on_delete = models.SET_NULL, null = True)
+    campaign           = models.CharField(max_length = 100)
     status_comment     = models.CharField(max_length = 100, null = True)
     status_date        = models.DateTimeField(auto_now_add = True)
     cycle              = models.CharField(max_length = 50)
@@ -76,20 +78,6 @@ class Payment(models.Model):
     class Meta:
         db_table = 'payments'
 
-class CampaignCourse(models.Model):
-    user               = models.ForeignKey('User', on_delete = models.SET_NULL, null = True)
-    campaign           = models.CharField(max_length = 50, null = True)
-    subscription_type  = models.ForeignKey('Subscription', on_delete = models.SET_NULL, null = True)
-
-    class Meta:
-        db_table = 'campaign_courses'
-
-class SubscriptionType(models.Model):
-    subscribe          = models.CharField(max_length = 50, null = True)
-
-    class Meta:
-        db_table = 'subscription_types'
-
 class Teacher(models.Model):
     user                 = models.ForeignKey('User', on_delete=models.SET_NULL,null = True)
     gender               = models.ForeignKey('GenderType', on_delete=models.SET_NULL, null  = True)
@@ -102,7 +90,7 @@ class Teacher(models.Model):
     twitter              = models.CharField(max_length = 200, null = True)
     linked_in            = models.CharField(max_length = 200, null = True)
     email                = models.CharField(max_length = 200, null = True)
-    facebook_messenger   = models.CharField(max_length = 200, null = True)
+    facebook_messenger   = models.CharField(max_length = 500, null = True)
     teacher_img          = models.URLField(max_length = 200, null = True)
 
     class Meta:
@@ -123,22 +111,23 @@ class ReviewGroup(models.Model):
 
 class TeacherReview(models.Model):
     user                 = models.ForeignKey('User', on_delete = models.SET_NULL, null = True)
+    teacher_rating       = models.ForeignKey('TeacherRating', on_delete = models.SET_NULL, null =True)
     review               = models.CharField(max_length = 200)
     write_date           = models.DateTimeField(auto_now_add = True)
-    teacher_rating       = models.IntegerField()
 
     class Meta:
         db_table = 'teacher_reviews'
+
+class TeacherRating(models.Model):
+    rating  = models.IntegerField(default = 0)
+
+    class meta:
+        db_table = 'teacher_ratings'
 
 class TeacherFollow(models.Model):
     user                 = models.ForeignKey('User', on_delete=models.SET_NULL, null = True)
     teacher              = models.ForeignKey('Teacher', on_delete=models.SET_NULL, null = True)
 
     class Meta:
-        db_table = 'teacher_follows'
+        db_table = 'teacher_followers'
 
-class Gender(models.Model):
-    name                 = models.CharField(max_length = 50, null = True)
-
-    class Meta:
-        db_table = 'gender'
