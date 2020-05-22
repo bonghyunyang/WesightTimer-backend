@@ -2,8 +2,31 @@ import json
 
 from django.test import TestCase, Client
 
-from user.models    import *
-from content.models import *
+from user.models    import (
+   PaymentStatus,
+   Payment,
+   Subscription,
+   Location,
+   TimeZone,
+   SocialType,
+   UserIntroduction,
+   User,
+   GenderType,
+   Teacher
+)
+from content.models import (
+   RootCategory,
+   MiddleCategory,
+   EndCategory,
+   ActivityType,
+   ContentType,
+   Target,
+   Content,
+   PlayList,
+   PlayListGroup
+)
+
+import unittest
 
 class ContentAppTest(TestCase):
 
@@ -194,8 +217,6 @@ class ContentAppTest(TestCase):
            play_list  = PlayList.objects.get(id=1),
            content    = Content.objects.get(id=3)
         )
-
-
 
     def tearDown(self):
         RootCategory.objects.all().delete(),

@@ -1,11 +1,17 @@
-import os
+import os, mimetypes
 from django.http             import HttpResponse, StreamingHttpResponse, JsonResponse
 from django.core.exceptions  import ObjectDoesNotExist
 from django.views            import View
 from pydub                   import AudioSegment
-from django.db.models        import Sum
-from .models                 import PlayList, PlayListGroup, Content
+from django.db.models        import Avg
 from user.models             import Teacher
+from .models                 import (
+    PlayList,
+    PlayListGroup,
+    Content,
+    ContentReview,
+    MiddleContentTag
+)
 
 class PlayLisInfoView(View):
     def get(self, request, playlist_id):
@@ -118,9 +124,6 @@ class RangeFileWrapper (object):
 class ContentPlay(View):
     def get(self, request, content_id):
         try:
-            if content_id < 0 or content_id > len(Content.objects.all()):
-                return HttpResponse(status = 404)
-
             second  = int(request.GET.get('second', 0))
             content  = Content.objects.get(id = content_id)
             source  = content.file_source
@@ -132,6 +135,9 @@ class ContentPlay(View):
 
             if second < 0 or second > length:
                 return HttpResponse(status = 400)
+
+            content_type, encoding = mimetypes.guess_type(source)
+            content_type = content_type or 'application/octet-stream'
 
             resp = StreamingHttpResponse(RangeFileWrapper(open(source, 'rb'), chunk * 1, chunk * second, size), status=200, content_type = 'audio/mp3')
             resp["Cache-Control"] = "no-cache"

@@ -1,10 +1,6 @@
 from django.urls     import path
 
-from .views          import (
-    PlayLisInfoView,
-    PlayListMain,
-    ContentPlay
-)
+from .views          import PlayLisInfoView, PlayListMain, ContentPlay
 
 urlpatterns = [
     path('/playlistinfo/<int:playlist_id>',  PlayLisInfoView.as_view()),

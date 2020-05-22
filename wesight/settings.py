@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'sslserver',
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -139,3 +140,8 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'x-requested-with',
 )
+
+APPEND_SLASH = False
+
+app_id = my_settings.app_id
+app_secret = my_settings.app_secret
