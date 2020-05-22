@@ -17,7 +17,6 @@ class EndCategory(models.Model):
     middle_category = models.ForeignKey('MiddleCategory', on_delete=models.SET_NULL, null=True)
     name            = models.CharField(max_length = 50)
 
-
     class Meta:
         db_table = 'end_categories'
 
