@@ -3,8 +3,9 @@ from django.http             import HttpResponse, StreamingHttpResponse, JsonRes
 from django.core.exceptions  import ObjectDoesNotExist
 from django.views            import View
 from pydub                   import AudioSegment
-from django.db.models        import Avg
+from django.db.models        import Sum, Avg, F
 from user.models             import Teacher
+from datetime                import datetime
 from .models                 import (
     PlayList,
     PlayListGroup,
@@ -125,8 +126,7 @@ class ContentPlay(View):
     def get(self, request, content_id):
         try:
             second  = int(request.GET.get('second', 0))
-            content  = Content.objects.get(id = content_id)
-            source  = content.file_source
+            source  = Content.objects.get(id = content_id).file_source
             name    = os.path.basename(source)
             size    = os.path.getsize(source)
             content = AudioSegment.from_mp3(source)
@@ -148,3 +148,73 @@ class ContentPlay(View):
 
         except ObjectDoesNotExist:
             return HttpResponse(status = 404)
+
+class StressPlaylistView(View):
+    def get(self, request):
+
+        content_id = request.GET.get('content_id', None)
+
+        if content_id == None:
+            return HttpResponse(status = 400)
+
+        rating   = ContentReview.objects.filter(id = content_id)
+        contentt = Content.objects.get(id = content_id)
+        rate_is  = ContentReview.objects.select_related('content', 'content_rating').filter(id = content_id).aggregate(Avg('content_rating__rating'))['content_rating__rating__avg']
+        
+        musicInfo = {
+            "playtime": contentt.running_time,
+            "title": contentt.title,
+            "teacher": contentt.teacher.unique_name,
+            "rate": str(rate_is),
+            "type": contentt.content_type.name,
+            "activity": contentt.activity_type.name,
+            "suitableTarget": contentt.target.name,
+            "musicDescription": contentt.description,
+            "player_image": contentt.image_url
+         }
+
+        tag1 = MiddleContentTag.objects.filter(content = content_id)
+
+        categoryInfo = []
+
+        for i in tag1:
+            categoryInfo.append(i.middle_category.name)
+
+        print(categoryInfo)
+
+        return JsonResponse({"musicInfo" : musicInfo, "categoryInfo" : categoryInfo}, status = 200)
+
+class StressReviewView(View):
+    def get(self, request):
+        
+        content_id = request.GET.get('content_id', None)
+
+        if content_id == None:
+            return HttpResponse(status = 400)                                   
+
+        content_rate = ContentReview.objects.select_related('content', 'user', 'content_rating').filter(id = content_id).aggregate(Avg('content_rating__rating'))
+        content_is = content_rate.values()
+        
+        review_element = ContentReview.objects.select_related('user', 'content').all().annotate(con_id=F('content_id__id'), username=F('user_id__full_name'), rating=F('content_rating_id__rating'), reviewContent=F('review')).values('con_id', 'username', 'rating', 'reviewContent', 'write_date')
+        
+        return JsonResponse({'review': list(content_is), 'reviews': list(review_element)}, status = 200)
+        return JsonResponse({'message':'review_does_not_exist'}, status = 400)
+
+
+class MainView(View):
+    def get(self, request):
+
+        offset  = int(request.GET.get('offset', 0))
+        limit   = int(request.GET.get('limit', 10))
+
+        main_elements = Content.objects.select_related('teacher').order_by('id')
+
+        main_content = [{
+                "scoretext"   : ContentReview.objects.select_related('content', 'content_rating').filter(id = content.id).aggregate(Avg('content_rating__rating'))['content_rating__rating__avg'],
+                "title"       : content.title,
+                "description" : content.teacher.name,
+                "time"        : str(content.running_time).split(':')[0] + ' ' + 'min',
+                "imageURL"    : content.image_url
+                } for content in main_elements[offset:offset+limit]]
+
+        return JsonResponse({'Rolldata' : list(main_content)}, status = 200)
