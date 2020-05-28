@@ -1,4 +1,4 @@
-from django.db         import models
+from django.db import models
 
 class RootCategory(models.Model):
     name  = models.CharField(max_length = 50)
@@ -48,6 +48,15 @@ class Content(models.Model):
 
     class Meta:
         db_table = 'contents'
+
+    def get_play_time_as_second(self):
+        time_temp  = self.running_time.split(':')
+
+        if len(time_temp) == 2:
+            min    += int(time_temp[0])
+            second += int(time_temp[1])
+
+        return (min*60) + second
 
 class ContentType(models.Model):
     name   = models.CharField(max_length = 50)

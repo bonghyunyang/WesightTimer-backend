@@ -53,13 +53,13 @@ class MyCourseGroup(models.Model):
         db_table = 'my_course_groups'
 
 class TimeZone(models.Model):
-    time               = models.CharField(max_length = 100)
+    time = models.CharField(max_length = 100)
 
     class Meta:
         db_table = 'time_zones'
 
 class PaymentStatus(models.Model):
-    status             = models.CharField(max_length = 50, default = 0)
+    status = models.CharField(max_length = 50)
 
     class Meta:
         db_table = 'payment_status'
@@ -78,6 +78,7 @@ class Subscription(models.Model):
         db_table = 'subscriptions'
 
 class Payment(models.Model):
+    # one to many 로 바꿔야 함
     card               = models.CharField(max_length = 50, null = True)
     number             = models.CharField(max_length = 50, null = True)
     expire_date        = models.DateTimeField(auto_now = True)
@@ -86,25 +87,25 @@ class Payment(models.Model):
         db_table = 'payments'
 
 class Teacher(models.Model):
-    user                 = models.ForeignKey('User', on_delete=models.SET_NULL,null = True)
-    gender               = models.ForeignKey('GenderType', on_delete=models.SET_NULL, null  = True)
-    location             = models.ForeignKey('Location', on_delete=models.SET_NULL, null = True)
-    name                 = models.CharField(max_length = 50)
-    unique_name          = models.CharField(max_length = 50, null = True)
-    teacher_bio          = models.TextField()
-    signup_date          = models.DateTimeField(auto_now_add = True)
-    facebook             = models.CharField(max_length = 200, null = True)
-    twitter              = models.CharField(max_length = 200, null = True)
-    linked_in            = models.CharField(max_length = 200, null = True)
-    email                = models.CharField(max_length = 200, null = True)
-    facebook_messenger   = models.CharField(max_length = 500, null = True)
-    teacher_img          = models.URLField(max_length = 200, null = True)
+    user               = models.ForeignKey('User', on_delete       = models.SET_NULL,null  = True)
+    gender             = models.ForeignKey('GenderType', on_delete = models.SET_NULL, null = True)
+    location           = models.ForeignKey('Location', on_delete   = models.SET_NULL, null = True)
+    name               = models.CharField(max_length = 50)
+    unique_name        = models.CharField(max_length = 50, null = True)
+    teacher_bio        = models.TextField()
+    signup_date        = models.DateTimeField(auto_now_add = True)
+    facebook           = models.CharField(max_length  = 200, null = True)
+    twitter            = models.CharField(max_length  = 200, null = True)
+    linked_in          = models.CharField(max_length  = 200, null = True)
+    email              = models.CharField(max_length  = 200, null = True)
+    facebook_messenger = models.CharField(max_length  = 500, null = True)
+    teacher_img        = models.URLField(max_length   = 200, null = True)
 
     class Meta:
         db_table = 'teachers'
 
 class GenderType(models.Model):
-    name                 = models.CharField(max_length = 50, null = True)
+    name = models.CharField(max_length = 50, null = True)
 
     class Meta:
         db_table = 'gender_types'
