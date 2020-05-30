@@ -11,7 +11,7 @@
 
 ## DataBase Modeling
 ![DB](https://user-images.githubusercontent.com/29778054/83321338-e71edc00-a289-11ea-84ef-149ebfe668b0.png)
-- [Aquery link](URL : https://aquerytool.com:443/aquerymain/index/?rurl=38546d5e-6fd7-46ab-b5c0-abaee1798f26&)
+- [Aquery link](https://aquerytool.com:443/aquerymain/index/?rurl=38546d5e-6fd7-46ab-b5c0-abaee1798f26&)
 - Aquery read-only key: o6306i
 
 ## API Documentation
