@@ -1,6 +1,13 @@
 from django.urls     import path
 
-from .views          import PlayLisInfoView, PlayListMain, ContentPlay, StressReviewView, StressPlaylistView, MainView
+from .views          import (
+    PlayLisInfoView,
+    PlayListMain,
+    ContentPlay,
+    StressReviewView,
+    StressPlaylistView,
+    MainView
+)
 
 urlpatterns = [
     path('/playlistinfo/<int:playlist_id>',  PlayLisInfoView.as_view()),
