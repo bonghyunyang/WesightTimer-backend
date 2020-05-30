@@ -2,7 +2,7 @@ import jwt, bcrypt, json, re
 from django.views                      import View
 from django.http                       import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.urls                       import reverse
-from .models                           import User
+from .models                           import User, Teacher
 from wesight.settings                  import SECRET_KEY
 from django.shortcuts import redirect
 
@@ -68,9 +68,7 @@ class SignInView(View):
 
 class TeacherView(View):
     def get(self, request):
-
         teacher_id = request.GET.get('teacher_id')
-
         teacher_info = Teacher.objects.get(id = teacher_id)
 
         teacher_detail = {
