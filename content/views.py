@@ -125,8 +125,7 @@ class ContentPlay(View):
     def get(self, request, content_id):
         try:
             second  = int(request.GET.get('second', 0))
-            content  = Content.objects.get(id = content_id)
-            source  = content.file_source
+            source  = Content.objects.get(id = content_id).file_source
             name    = os.path.basename(source)
             size    = os.path.getsize(source)
             content = AudioSegment.from_mp3(source)
@@ -198,8 +197,6 @@ class StressReviewView(View):
         review_element = ContentReview.objects.select_related('user', 'content').all().annotate(con_id=F('content_id__id'), username=F('user_id__full_name'), rating=F('content_rating_id__rating'), reviewContent=F('review')).values('con_id', 'username', 'rating', 'reviewContent', 'write_date')
         
         return JsonResponse({'review': list(content_is), 'reviews': list(review_element)}, status = 200)
-        return JsonResponse({'message':'review_does_not_exist'}, status = 400)
-
 
 class MainView(View):
     def get(self, request):
